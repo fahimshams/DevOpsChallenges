@@ -21,8 +21,9 @@ This project demonstrates how to integrate external APIs, process data, and inte
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/WeatherDashboard.git
-   cd WeatherDashboard
+   git clone https://github.com/your-username/DevOpsChallanges.git
+   cd DevOpsChallenges
+   cd weather-dashboard
 
 2. Create a virtual environment and activate it:
    ```bash
@@ -42,6 +43,3 @@ This project demonstrates how to integrate external APIs, process data, and inte
 5. Run the application
    ```bash
    python weather_dashboard.py
-
-
-
