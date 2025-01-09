@@ -27,9 +27,9 @@ This project demonstrates how to integrate external APIs, process data, and inte
 
 2. Create a virtual environment and activate it:
    ```bash
-  python3 -m venv venv
-  source venv/bin/activate  # For Linux/Mac
-  venv\Scripts\activate     # For Windows
+   python3 -m venv venv
+   source venv/bin/activate  # For Linux/Mac
+   venv\Scripts\activate     # For Windows
 
 3. Install the required dependencies
    ```bash
