@@ -36,8 +36,8 @@ This project demonstrates how to integrate external APIs, process data, and inte
 
 4. Set up environment variables
    ```bash
-  OPENWEATHER_API_KEY=your_openweather_api_key
-  AWS_BUCKET_NAME=your_s3_bucket_name
+   OPENWEATHER_API_KEY=your_openweather_api_key
+   AWS_BUCKET_NAME=your_s3_bucket_name
 
 5. Run the application
    ```bash
