@@ -7,54 +7,76 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class NotificationService:
-    def __init__(self):
-        self.canvas_domain = os.getenv('CANVAS_DOMAIN')
-        self.api_key = os.getenv('CANVAS_API_TOKEN')
+canvas_domain = os.getenv('CANVAS_DOMAIN')
+api_key = os.getenv('CANVAS_API_KEY')
 
-    def get_canvas_courses(self):
+def get_canvas_courses():
         """Get list of courses from Canvas API"""
-        url = f"{self.canvas_domain}/api/v1/courses"
+        url = f"{canvas_domain}/api/v1/courses"
         headers = {
-            "Authorization": f"Bearer {self.api_key}"
+            "Authorization": f"Bearer {api_key}"
         }
 
-        response = requests.get(url, headers=headers)
-
-        if response.status_code == 200:
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
             return response.json()
-        else:
-            print(f"Error fetching courses: {response.text}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching courses: {e}")
             return None
         
     
-    def get_specific_course_details(self, course_id, assignment_id):
+def get_specific_course_details(course_id):
         """Get details for a specific course"""
-        url = f"{self.canvas_domain}/api/v1/courses/{course_id}/enrollments"
+        url = f"{canvas_domain}/api/v1/courses/{course_id}/enrollments"
         headers = {
-            "Authorization": f"Bearer {self.api_key}"
+            "Authorization": f"Bearer {api_key}"
         }
 
-        print(f"Headers: {headers}")  # Debugging line
-
-        response = requests.get(url, headers=headers)
-        if response.status_code == 200:
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
             return response.json()
-        else:
-            print(f"Error fetching course details: {response.text}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching courses: {e}")
             return None
+        
+def format_data(detail):
+            user = detail['user']
+            grades = detail['grades']['final_grade']
+            return(f"User: {user['name']}, Grades: {grades}")
 
-
-
-def main():
-    notification_service = NotificationService()
-    courses = notification_service.get_specific_course_details(2066, 81288)
+def lambda_handler(event, context):
+    sns_topic_arn = os.getenv("SNS_TOPIC_ARN")
+    sns_client = boto3.client('sns')
+    courses = get_canvas_courses()
+    messages = []
     if courses:
-        print(json.dumps(courses, indent=2))
+        for course in courses:
+            if course.get('enrollment_term_id') == 212:
+                course_id = course.get('id')
+                course_details = get_specific_course_details(course_id)
+                if course_details:
+                    course_messages = [format_data(detail) for detail in course_details]
+                    messages.append(f"\nCourse Name: {course['name']}\n------------------------------------------------")
+                    messages.extend(course_messages)
+                else:
+                    messages.append("No course details found")
+    else:
+        messages.append("No courses found")
+    
+    message = "\n".join(messages)
 
 
-if __name__ == '__main__':
-    main()
-
-
-
+    # Publish to SNS
+    
+    try:
+        
+        response = sns_client.publish(
+            TopicArn=sns_topic_arn,
+            Message=messages,
+            Subject='Canvas Course Grades'
+        )
+        print(f"Successfully published to SNS: {response}")
+    except Exception as e:
+        print(f"Error publishing to SNS: {e}")   
