@@ -2,10 +2,7 @@ import os
 import json
 import boto3
 import requests
-from datetime import datetime
-from dotenv import load_dotenv
 
-load_dotenv()
 
 canvas_domain = os.getenv('CANVAS_DOMAIN')
 api_key = os.getenv('CANVAS_API_KEY')
@@ -44,7 +41,7 @@ def get_specific_course_details(course_id):
 def format_data(detail):
             user = detail['user']
             grades = detail['grades']['final_grade']
-            return(f"User: {user['name']}, Grades: {grades}")
+            return(f"Student: {user['name']}, Grades: {grades}")
 
 def lambda_handler(event, context):
     sns_topic_arn = os.getenv("SNS_TOPIC_ARN")
@@ -58,7 +55,7 @@ def lambda_handler(event, context):
                 course_details = get_specific_course_details(course_id)
                 if course_details:
                     course_messages = [format_data(detail) for detail in course_details]
-                    messages.append(f"\nCourse Name: {course['name']}\n------------------------------------------------")
+                    messages.append(f"\n Course Name: {course['name']}\n------------------------------------------------")
                     messages.extend(course_messages)
                 else:
                     messages.append("No course details found")
@@ -74,7 +71,7 @@ def lambda_handler(event, context):
         
         response = sns_client.publish(
             TopicArn=sns_topic_arn,
-            Message=messages,
+            Message=message,
             Subject='Canvas Course Grades'
         )
         print(f"Successfully published to SNS: {response}")
