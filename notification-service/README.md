@@ -1,4 +1,4 @@
-# Canvas Course Notification Service
+# Automating Insights with Canvas API & AWS
 
 This project is a notification service that fetches course details from the Canvas API and publishes them to an AWS SNS topic. It is designed to help automate the process of retrieving course information and notifying users via SNS.
 
