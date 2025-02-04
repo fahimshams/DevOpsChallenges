@@ -10,26 +10,38 @@ load_dotenv()
 api_key = os.getenv("API_KEY")
 nfl_endpoint = os.getenv("NFL_ENDPOINT")
 
-# AWS Clients
 
+# AWS Clients
 s3_client = boto3.client('s3')
+glue_client = boto3.client('glue')
+athena_client = boto3.client('athena')
 
 
 
 def create_s3_bucket(bucket_name):
         """Create an S3 bucket"""
         try:
-
             # Create the bucket
-                # In us-east-1, no LocationConstraint is needed
-            # s3_client.create_bucket(Bucket=bucket_name)
+            # In us-east-1, no LocationConstraint is needed
+
             s3_client.create_bucket(Bucket=bucket_name)
-            print(f"Successfully created bucket {bucket_name}")
-            print(f"Bucket {bucket_name} exists")
 
             print(f"Bucket {bucket_name} created successfully in ")
         except Exception as e:
             print(f"Error creating bucket: {e}")
+
+
+def create_glue_database(database_name):
+    """Create a Glue database"""
+    try:
+        glue_client.create_database(
+            DatabaseInput={
+                'Name': database_name
+            }
+        )
+        print(f"Database {database_name} created successfully")
+    except Exception as e:
+        print(f"Error creating database: {e}")
 
 
 def get_nba_data():
