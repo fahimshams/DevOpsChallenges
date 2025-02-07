@@ -145,6 +145,22 @@ def create_glue_table():
         print("Table created successfully")
     except Exception as e:
         print(f"Error creating table: {e}")
+        
+def configure_athena():
+    """Setup Athena output location"""
+    try:
+        athena_client.start_query_execution(
+            QueryString="CREATE DATABASE IF NOT EXISTS nfl_analytics",
+            QueryExecutionContext={
+                'Database': glue_database_name
+            },
+            ResultConfiguration={
+                'OutputLocation': athena_output_location
+            }
+        )
+        print("Athena output location configured successfully")
+    except Exception as e:
+        print(f"Error configuring Athena: {e}")
 
 
 def get_nba_data():
@@ -185,11 +201,10 @@ def main():
     # Create Glue table
     create_glue_table()
     
-    # Run crawler
-    # run_crawler()
+    # Configure Athena
+    configure_athena()
     
-    # Run Athena query
-    # run_athena_query()
+    print("Data lake setup completed")
 
 
 if __name__ == "__main__":
